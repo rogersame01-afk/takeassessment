@@ -182,7 +182,7 @@ a { color: var(--accent); }
   <div class="meta">
     <span>For AJH (CEO) and Joanna (COO)</span>
     <span>Sources: Pipeline, Contracts, Marketplace tables</span>
-    <span>Queries: 05b, 06, 07 (BigQuery)</span>
+    <span>Queries: 04, 05, 06 (BigQuery)</span>
   </div>
 </header>
 
@@ -212,21 +212,21 @@ a { color: var(--accent); }
           <td class="r num"><span class="struck">83.62%</span></td>
           <td class="r num">79.26%</td>
           <td><span class="chip c-bad">Discrepancy</span></td>
-          <td class="why">The draft averaged the metro rates, so a 6-shift metro counted as much as a 2,400-shift one. Correct is total filled ÷ total posted: 8,311 ÷ 10,486. <span class="src">05b · SUPPORT 0</span></td>
+          <td class="why">The draft averaged the metro rates, so a 6-shift metro counted as much as a 2,400-shift one. Correct is total filled ÷ total posted: 8,311 ÷ 10,486. <span class="src">04 · SUPPORT 0</span></td>
         </tr>
         <tr>
           <td>Contract retention</td>
           <td class="r num"><span class="struck">83.67%</span></td>
           <td class="r num">57.89%</td>
           <td><span class="chip c-bad">Discrepancy</span></td>
-          <td class="why">The draft divided by all 49 contracts and counted the ones not yet due as kept. Correct is renewed ÷ contracts that ended this year: 11 of 19. <span class="src">05b · SUPPORT 5</span></td>
+          <td class="why">The draft divided by all 49 contracts and counted the ones not yet due as kept. Correct is renewed ÷ contracts that ended this year: 11 of 19. <span class="src">04 · SUPPORT 5</span></td>
         </tr>
         <tr>
           <td>Win rate</td>
           <td class="r num"><span class="struck">39.97%</span></td>
           <td class="r num">24.44%</td>
           <td><span class="chip c-bad">Discrepancy</span></td>
-          <td class="why">The draft shows win rate by value under a by-count label. By count: 11 won of 45 closed. <span class="src">05b · SUPPORT 7</span></td>
+          <td class="why">The draft shows win rate by value under a by-count label. By count: 11 won of 45 closed. <span class="src">04 · SUPPORT 7</span></td>
         </tr>
         <tr>
           <td>Working ATs</td>
@@ -247,14 +247,14 @@ a { color: var(--accent); }
           <td class="r num">$2,321,000</td>
           <td class="r num">$2,321,000</td>
           <td><span class="chip c-ok">Match</span></td>
-          <td class="why">Annual value of contracts active on 09/30. The bridge from August reconciles with zero difference. <span class="src">05b · SUPPORT 11</span></td>
+          <td class="why">Annual value of contracts active on 09/30. The bridge from August reconciles with zero difference. <span class="src">04 · SUPPORT 11</span></td>
         </tr>
         <tr>
           <td>Open pipeline</td>
           <td class="r num">$1,012,000</td>
           <td class="r num">$1,012,000</td>
           <td><span class="chip c-warn">Pending review</span></td>
-          <td class="why">Raw CRM total of 15 open deals, kept as recorded. D-1059 may duplicate D-1056 (same account, contact, scope and $96k). If the business confirms it: $916,000, 14 deals. <span class="src">05b · SUPPORT 9</span></td>
+          <td class="why">Raw CRM total of 15 open deals, kept as recorded. D-1059 may duplicate D-1056 (same account, contact, scope and $96k). If the business confirms it: $916,000, 14 deals. <span class="src">04 · SUPPORT 9</span></td>
         </tr>
         <tr>
           <td>Cash floor</td>
@@ -270,7 +270,7 @@ a { color: var(--accent); }
   <figure>
     <h3>The draft called September the best month. It was the worst.</h3>
     <svg id="trend" viewBox="0 0 640 220" role="img" aria-label="Company fill rate by month, April 82.0% to September 79.3%, with the draft's 83.6% shown for September"></svg>
-    <figcaption>Company fill, total filled ÷ total posted, April to September 2026. The red mark is the draft's averaged figure for September. <span class="src">05b · SUPPORT 0</span></figcaption>
+    <figcaption>Company fill, total filled ÷ total posted, April to September 2026. The red mark is the draft's averaged figure for September. <span class="src">04 · SUPPORT 0</span></figcaption>
   </figure>
 </section>
 
@@ -332,7 +332,7 @@ a { color: var(--accent); }
   <div class="section-head">
     <div class="eyebrow">Part 3 · Metro by metro</div>
     <h2 id="score-h">Commercial scorecard</h2>
-    <p class="lede">Fill, lost value and upcoming renewals side by side. Tiers are explicit rules, so each one maps to an action. <span class="src">07_metro_scorecard</span></p>
+    <p class="lede">Fill, lost value and upcoming renewals side by side. Tiers are explicit rules, so each one maps to an action. <span class="src">06_metro_scorecard</span></p>
   </div>
   <div class="table-box">
     <table>
@@ -502,7 +502,7 @@ a { color: var(--accent); }
 </section>
 
 <footer>
-  <span>Built from 05b_board_reconciliation.sql, 06_investigation.sql and 07_metro_scorecard.sql on the Pipeline, Contracts and Marketplace tables.</span>
+  <span>Built from 04_board_reconciliation.sql, 05_investigation.sql and 06_metro_scorecard.sql on the Pipeline, Contracts and Marketplace tables.</span>
   <span>Source tags like <span class="src">Q4.5</span> name the query that produced each figure.</span>
 </footer>
 
