@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, -apple-system, "Segoe UI", sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Go4 September Board Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@500;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single audit packet column. Ledger first, then the evidence chain, then the decision. Source tags on every figure. */
+:root {
+  --paper: #f6f8f7;
+  --sheet: #ffffff;
+  --ink: #16212b;
+  --muted: #5b6873;
+  --rule: #d9e0e3;
+  --accent: #1d5c86;
+  --accent-soft: #e3eef5;
+  --ok: #2f7a4f;
+  --ok-soft: #e2f1e8;
+  --bad: #b23a36;
+  --bad-soft: #f8e3e1;
+  --warn: #9a6a12;
+  --warn-soft: #f6ecd6;
+  --none: #66717a;
+  --none-soft: #e9edef;
+  --display: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #10171d; --sheet: #172129; --ink: #e6ecef; --muted: #9aa8b2; --rule: #2a3741;
+    --accent: #78b3dc; --accent-soft: #1c3445;
+    --ok: #6cc28f; --ok-soft: #173326; --bad: #ee8a84; --bad-soft: #3c1f1f;
+    --warn: #e2b55c; --warn-soft: #382c14; --none: #a3aeb6; --none-soft: #24303a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #10171d; --sheet: #172129; --ink: #e6ecef; --muted: #9aa8b2; --rule: #2a3741;
+  --accent: #78b3dc; --accent-soft: #1c3445;
+  --ok: #6cc28f; --ok-soft: #173326; --bad: #ee8a84; --bad-soft: #3c1f1f;
+  --warn: #e2b55c; --warn-soft: #382c14; --none: #a3aeb6; --none-soft: #24303a;
+  color-scheme: dark;
+}
+
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1rem; line-height: 1.55; }
+.wrap {
+  max-width: 64rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2.5rem 4rem;
+  display: grid; gap: 3.25rem;
+}
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.7rem); font-weight: 800; letter-spacing: -0.015em; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.src { font-family: var(--mono); font-size: 0.7rem; color: var(--accent); background: var(--accent-soft); padding: 0.05rem 0.35rem; border-radius: 3px; white-space: nowrap; }
+section { display: grid; gap: 1.1rem; min-width: 0; }
+.section-head { display: grid; gap: 0.35rem; }
+.lede { color: var(--muted); }
+
+/* Header */
+header { display: grid; gap: 1rem; border-bottom: 2px solid var(--ink); padding-bottom: 1.5rem; }
+.meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; color: var(--muted); font-size: 0.9rem; }
+.bottom-line { font-size: 1.15rem; max-width: 62ch; }
+.bottom-line strong { font-weight: 600; }
+
+/* Tally */
+.tally { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--rule); background: var(--sheet); }
+.tally div { padding: 0.9rem 1rem; display: grid; gap: 0.15rem; border-right: 1px solid var(--rule); }
+.tally div:last-child { border-right: 0; }
+.tally .n { font-family: var(--display); font-size: 1.9rem; font-weight: 800; line-height: 1; }
+.tally .l { font-size: 0.85rem; color: var(--muted); }
+.t-bad .n { color: var(--bad); } .t-ok .n { color: var(--ok); } .t-warn .n { color: var(--warn); } .t-none .n { color: var(--none); }
+
+/* Tables */
+.table-box { overflow-x: auto; border: 1px solid var(--rule); background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--paper); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.r, th.r { text-align: right; }
+td.num, td .num { white-space: nowrap; }
+.ledger td:first-child { font-weight: 600; white-space: nowrap; }
+.ledger .why { color: var(--muted); font-size: 0.86rem; min-width: 16rem; }
+.struck { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--bad); }
+.chip { display: inline-block; font-family: var(--mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.15rem 0.45rem; border-radius: 3px; white-space: nowrap; }
+.c-ok { color: var(--ok); background: var(--ok-soft); }
+.c-bad { color: var(--bad); background: var(--bad-soft); }
+.c-warn { color: var(--warn); background: var(--warn-soft); }
+.c-none { color: var(--none); background: var(--none-soft); }
+tfoot td { font-weight: 600; background: var(--paper); }
+
+/* Charts */
+.chart-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 1.25rem; }
+figure { margin: 0; background: var(--sheet); border: 1px solid var(--rule); padding: 1rem 1rem 0.75rem; display: grid; gap: 0.5rem; min-width: 0; }
+figcaption { font-size: 0.86rem; color: var(--muted); }
+figure h3 { font-size: 0.98rem; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+svg .lbl { fill: var(--ink); font-family: var(--body); font-size: 12.5px; }
+svg .val { fill: var(--ink); font-size: 11px; }
+svg .val-bad { fill: var(--bad); font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.8rem; color: var(--muted); }
+.legend i { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; margin-right: 0.35rem; vertical-align: -0.05rem; }
+
+/* Evidence chain */
+.chain { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: step; border-left: 2px solid var(--rule); }
+.chain li { counter-increment: step; position: relative; padding: 0 0 1.4rem 1.6rem; display: grid; gap: 0.3rem; }
+.chain li:last-child { padding-bottom: 0; }
+.chain li::before { content: counter(step); position: absolute; left: -0.8rem; top: 0; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 0.75rem; display: grid; place-items: center; }
+.chain li.caution::before { content: "!"; background: var(--warn); color: var(--sheet); }
+.chain li.ruled::before { content: "×"; background: var(--none); color: var(--sheet); }
+.chain .claim { font-weight: 600; }
+.chain p { color: var(--ink); }
+.chain .detail { color: var(--muted); font-size: 0.93rem; }
+
+/* Tiers */
+.tier { font-weight: 600; white-space: nowrap; }
+.tier::before { content: ""; display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 2px; margin-right: 0.45rem; vertical-align: 0.05rem; background: var(--none); }
+.tier-act::before { background: var(--bad); }
+.tier-protect::before { background: var(--warn); }
+.tier-monitor::before { background: var(--accent); }
+.tier-stable::before { background: var(--ok); }
+tr.hot td { background: var(--bad-soft); }
+.low { color: var(--bad); font-weight: 600; }
+
+/* Recommendations */
+.recs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.recs li { background: var(--sheet); border: 1px solid var(--rule); padding: 1rem 1.1rem; display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); gap: 0.25rem 1rem; }
+.recs li.lead { border-color: var(--ink); border-width: 2px; }
+.recs .when { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding-top: 0.2rem; }
+.recs .body { display: grid; gap: 0.35rem; min-width: 0; }
+.recs .body p { color: var(--muted); font-size: 0.94rem; }
+.recs .body p.because { color: var(--ink); font-size: 0.9rem; }
+.accounts { margin: 0; padding-left: 1.1rem; font-size: 0.92rem; color: var(--muted); }
+
+.scen-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.note { font-size: 0.86rem; color: var(--muted); max-width: 72ch; }
+
+.two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem 2rem; }
+.list { margin: 0; padding-left: 1.15rem; display: grid; gap: 0.5rem; font-size: 0.94rem; }
+.list li::marker { color: var(--muted); }
+
+footer { border-top: 1px solid var(--rule); padding-top: 1rem; font-size: 0.82rem; color: var(--muted); display: grid; gap: 0.3rem; }
+
+@media (max-width: 760px) {
+  .chart-pair, .scen-grid, .two-col { grid-template-columns: minmax(0, 1fr); }
+  .tally { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tally div:nth-child(2) { border-right: 0; }
+  .tally div:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
+  .recs li { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chain li { transition: background-color 0.2s; }
+}
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Board pack audit · data as of 09/30/2026</div>
+  <h1>Go4 September Board Review</h1>
+  <p class="bottom-line">The draft dashboard overstates performance. Corrected, <strong>contract retention is 57.9% against a 70% plan</strong>, company fill fell to <strong>79.3%, its lowest month this year</strong>, and win rate is 24.4%. Both the coverage problem and the customer losses sit in <strong>Philadelphia and Baltimore</strong>, where $387k of contracts renew by December.</p>
+  <div class="meta">
+    <span>For AJH (CEO) and Joanna (COO)</span>
+    <span>Sources: Pipeline, Contracts, Marketplace tables</span>
+    <span>Queries: 05b, 06, 07 (BigQuery)</span>
+  </div>
+</header>
+
+<!-- 1. Reconciliation -->
+<section aria-labelledby="recon-h">
+  <div class="section-head">
+    <div class="eyebrow">Part 1 · Is each board number right?</div>
+    <h2 id="recon-h">Reconciliation of the eight board figures</h2>
+    <p class="lede">Each figure recalculated from the source tables against its written definition, then compared with the draft.</p>
+  </div>
+
+  <div class="tally" role="list">
+    <div class="t-bad" role="listitem"><span class="n">3</span><span class="l">wrong in the draft</span></div>
+    <div class="t-ok" role="listitem"><span class="n">3</span><span class="l">match</span></div>
+    <div class="t-warn" role="listitem"><span class="n">1</span><span class="l">match, pending review</span></div>
+    <div class="t-none" role="listitem"><span class="n">1</span><span class="l">can't be checked from the pack</span></div>
+  </div>
+
+  <div class="table-box">
+    <table class="ledger">
+      <thead>
+        <tr><th>Metric</th><th class="r">Draft</th><th class="r">Corrected</th><th>Status</th><th>What happened</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Fill rate</td>
+          <td class="r num"><span class="struck">83.62%</span></td>
+          <td class="r num">79.26%</td>
+          <td><span class="chip c-bad">Discrepancy</span></td>
+          <td class="why">The draft averaged the metro rates, so a 6-shift metro counted as much as a 2,400-shift one. Correct is total filled ÷ total posted: 8,311 ÷ 10,486. <span class="src">05b · SUPPORT 0</span></td>
+        </tr>
+        <tr>
+          <td>Contract retention</td>
+          <td class="r num"><span class="struck">83.67%</span></td>
+          <td class="r num">57.89%</td>
+          <td><span class="chip c-bad">Discrepancy</span></td>
+          <td class="why">The draft divided by all 49 contracts and counted the ones not yet due as kept. Correct is renewed ÷ contracts that ended this year: 11 of 19. <span class="src">05b · SUPPORT 5</span></td>
+        </tr>
+        <tr>
+          <td>Win rate</td>
+          <td class="r num"><span class="struck">39.97%</span></td>
+          <td class="r num">24.44%</td>
+          <td><span class="chip c-bad">Discrepancy</span></td>
+          <td class="why">The draft shows win rate by value under a by-count label. By count: 11 won of 45 closed. <span class="src">05b · SUPPORT 7</span></td>
+        </tr>
+        <tr>
+          <td>Working ATs</td>
+          <td class="r num">1,866</td>
+          <td class="r num">1,866</td>
+          <td><span class="chip c-ok">Match</span></td>
+          <td class="why">Sum across metros. Assumes no AT works in two metros; AT-level data would confirm it.</td>
+        </tr>
+        <tr>
+          <td>Productive metros</td>
+          <td class="r num">8</td>
+          <td class="r num">8</td>
+          <td><span class="chip c-ok">Match</span></td>
+          <td class="why">At least 25 working ATs and fill of at least 75%. Philadelphia and Baltimore fail on fill; Tucson and Boise on size.</td>
+        </tr>
+        <tr>
+          <td>Contract book</td>
+          <td class="r num">$2,321,000</td>
+          <td class="r num">$2,321,000</td>
+          <td><span class="chip c-ok">Match</span></td>
+          <td class="why">Annual value of contracts active on 09/30. The bridge from August reconciles with zero difference. <span class="src">05b · SUPPORT 11</span></td>
+        </tr>
+        <tr>
+          <td>Open pipeline</td>
+          <td class="r num">$1,012,000</td>
+          <td class="r num">$1,012,000</td>
+          <td><span class="chip c-warn">Pending review</span></td>
+          <td class="why">Raw CRM total of 15 open deals, kept as recorded. D-1059 may duplicate D-1056 (same account, contact, scope and $96k). If the business confirms it: $916,000, 14 deals. <span class="src">05b · SUPPORT 9</span></td>
+        </tr>
+        <tr>
+          <td>Cash floor</td>
+          <td class="r num">$1,040,000</td>
+          <td class="r num">–</td>
+          <td><span class="chip c-none">Not verified</span></td>
+          <td class="why">Comes from Finance's 09/28 forecast, which isn't in the data pack. Finance should confirm which retention and pipeline figures it assumes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <h3>The draft called September the best month. It was the worst.</h3>
+    <svg id="trend" viewBox="0 0 640 220" role="img" aria-label="Company fill rate by month, April 82.0% to September 79.3%, with the draft's 83.6% shown for September"></svg>
+    <figcaption>Company fill, total filled ÷ total posted, April to September 2026. The red mark is the draft's averaged figure for September. <span class="src">05b · SUPPORT 0</span></figcaption>
+  </figure>
+</section>
+
+<!-- 2. Findings -->
+<section aria-labelledby="find-h">
+  <div class="section-head">
+    <div class="eyebrow">Part 2 · Why, and where?</div>
+    <h2 id="find-h">The evidence chain</h2>
+    <p class="lede">Each step tests one idea. Together they point to two metros, and they rule out the obvious alternatives.</p>
+  </div>
+
+  <div class="chart-pair">
+    <figure>
+      <h3>Retention, 2026 to date</h3>
+      <svg id="ret" viewBox="0 0 300 200" role="img" aria-label="Retention: Philadelphia and Baltimore 25%, 2 of 8; all other metros 82%, 9 of 11; plan 70%"></svg>
+      <figcaption>Contracts that ended January to September. <span class="src">Q4.5</span></figcaption>
+    </figure>
+    <figure>
+      <h3>Fill by metro, April to September</h3>
+      <svg id="dumbbell" viewBox="0 0 520 330" role="img" aria-label="Fill by metro from April to September. Philadelphia fell from 84% to 73%, Baltimore from 83% to 71%. Every other metro rose 2 to 3 points."></svg>
+      <div class="legend"><span><i style="background: var(--muted)"></i>April</span><span><i style="background: var(--accent)"></i>September</span><span><i style="background: var(--bad)"></i>September, below 75%</span></div>
+    </figure>
+  </div>
+
+  <ol class="chain">
+    <li>
+      <p class="claim">Fill fell in only two metros.</p>
+      <p class="detail">Philadelphia went from 84% to 73% and Baltimore from 83% to 71% since April. Every other established metro improved by 2 to 3 points. <span class="src">Q4.1</span></p>
+    </li>
+    <li>
+      <p class="claim">Those two metros hold half the problem.</p>
+      <p class="detail">1,083 of the company's 2,175 unfilled shifts in September (50%) were in Philadelphia and Baltimore. <span class="src">Q4.3</span></p>
+    </li>
+    <li>
+      <p class="claim">It isn't extra demand.</p>
+      <p class="detail">Since April every metro got 44–54% more shift requests and added 22–35% more ATs. Elsewhere each AT took on more shifts (now 4.3–4.7 a month). In Philadelphia and Baltimore they stayed at about 4.2. <span class="src">Q4.2</span></p>
+    </li>
+    <li>
+      <p class="claim">The same two metros are losing contract customers.</p>
+      <p class="detail">Retention is 25% there (2 of 8) against 82% everywhere else (9 of 11). They account for 6 of the 8 lost contracts and $460k of the $500k churned value. <span class="src">Q4.5</span></p>
+    </li>
+    <li class="ruled">
+      <p class="claim">Ruled out: a segment problem, contract load, and sales as the cause.</p>
+      <p class="detail">The lost customers there were 2 clubs, 2 schools and 2 facilities <span class="src">Q4.6</span>. Charlotte has the most contracts per AT (4 per 100) and still fills 80% <span class="src">Q4.12</span>. Outbound sales win only 2 of 31 deals against 7 of 12 inbound, which is a real but separate issue <span class="src">Q4.8</span>.</p>
+    </li>
+    <li class="caution">
+      <p class="claim">Caution: this shows the problems in the same place, not that one caused the other.</p>
+      <p class="detail">Most customers left in June to August, before the September drop. In the three months before renewal, churned contracts there had about 81% fill against 83% for those that renewed. Charlotte had the lowest pre-renewal fill (78%) and kept both contracts. <span class="src">Q4.4</span></p>
+    </li>
+    <li>
+      <p class="claim">More is at risk, and the 70% plan now needs every renewal.</p>
+      <p class="detail">Eight contracts worth $615k renew by December, five of them ($387k) in Philadelphia and Baltimore <span class="src">Q4.7</span>. Reaching 70% for 2026 takes all eight: 19 of 27 is 70.4%, and one more churn caps the year at 66.7% <span class="src">Q4.11B</span>.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- 3. Scorecard -->
+<section aria-labelledby="score-h">
+  <div class="section-head">
+    <div class="eyebrow">Part 3 · Metro by metro</div>
+    <h2 id="score-h">Commercial scorecard</h2>
+    <p class="lede">Fill, lost value and upcoming renewals side by side. Tiers are explicit rules, so each one maps to an action. <span class="src">07_metro_scorecard</span></p>
+  </div>
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th><th>Metro</th><th class="r">Fill Sep</th><th class="r">vs Apr</th><th class="r">Share of unfilled</th>
+          <th class="r">Renewed YTD</th><th class="r">Churned YTD</th><th class="r">Active book</th><th class="r">Renewing Oct–Dec</th><th class="r">Renewing Oct–Mar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hot"><td class="tier tier-act">Act now</td><td>Philadelphia</td><td class="r num low">73.0%</td><td class="r num low">−11.0</td><td class="r num">29.8%</td><td class="r num">1 of 4</td><td class="r num">$241k</td><td class="r num">$417k</td><td class="r num">3 · $254k</td><td class="r num">3 · $254k</td></tr>
+        <tr class="hot"><td class="tier tier-act">Act now</td><td>Baltimore</td><td class="r num low">71.0%</td><td class="r num low">−12.0</td><td class="r num">20.0%</td><td class="r num">1 of 4</td><td class="r num">$219k</td><td class="r num">$317k</td><td class="r num">2 · $133k</td><td class="r num">2 · $133k</td></tr>
+        <tr><td class="tier tier-protect">Protect renewals</td><td>Washington DC</td><td class="r num">81.0%</td><td class="r num">+2.0</td><td class="r num">10.5%</td><td class="r num">1 of 1</td><td class="r num">–</td><td class="r num">$196k</td><td class="r num">1 · $112k</td><td class="r num">2 · $136k</td></tr>
+        <tr><td class="tier tier-protect">Protect renewals</td><td>Charlotte</td><td class="r num">80.0%</td><td class="r num">+3.1</td><td class="r num">3.7%</td><td class="r num">2 of 2</td><td class="r num">–</td><td class="r num">$261k</td><td class="r num">1 · $96k</td><td class="r num">1 · $96k</td></tr>
+        <tr><td class="tier tier-protect">Protect renewals</td><td>Lehigh Valley</td><td class="r num">84.0%</td><td class="r num">+2.0</td><td class="r num">4.4%</td><td class="r num">–</td><td class="r num">–</td><td class="r num">$84k</td><td class="r num">1 · $20k</td><td class="r num">1 · $20k</td></tr>
+        <tr><td class="tier tier-monitor">Monitor</td><td>Northern NJ</td><td class="r num">84.0%</td><td class="r num">+2.0</td><td class="r num">13.2%</td><td class="r num">2 of 3</td><td class="r num">$22k</td><td class="r num">$399k</td><td class="r num">–</td><td class="r num">–</td></tr>
+        <tr><td class="tier tier-monitor">Monitor</td><td>Richmond</td><td class="r num">83.1%</td><td class="r num">+3.1</td><td class="r num">3.5%</td><td class="r num">0 of 1</td><td class="r num">$18k</td><td class="r num">$79k</td><td class="r num">–</td><td class="r num">–</td></tr>
+        <tr><td class="tier tier-stable">Stable</td><td>Columbus</td><td class="r num">84.0%</td><td class="r num">+2.9</td><td class="r num">5.1%</td><td class="r num">1 of 1</td><td class="r num">–</td><td class="r num">$255k</td><td class="r num">–</td><td class="r num">–</td></tr>
+        <tr><td class="tier tier-stable">Stable</td><td>Harrisburg-Lancaster</td><td class="r num">85.0%</td><td class="r num">+2.9</td><td class="r num">3.4%</td><td class="r num">1 of 1</td><td class="r num">–</td><td class="r num">$75k</td><td class="r num">–</td><td class="r num">1 · $21k</td></tr>
+        <tr><td class="tier tier-stable">Stable</td><td>Pittsburgh</td><td class="r num">85.0%</td><td class="r num">+2.0</td><td class="r num">6.2%</td><td class="r num">2 of 2</td><td class="r num">–</td><td class="r num">$238k</td><td class="r num">–</td><td class="r num">2 · $153k</td></tr>
+        <tr><td class="tier">Too small to rate</td><td>Tucson · 9 ATs</td><td class="r num">93.3%</td><td class="r num">–</td><td class="r num">0.1%</td><td class="r num">–</td><td class="r num">–</td><td class="r num">–</td><td class="r num">–</td><td class="r num">–</td></tr>
+        <tr><td class="tier">Too small to rate</td><td>Boise · 3 ATs</td><td class="r num">100%</td><td class="r num">–</td><td class="r num">0%</td><td class="r num">–</td><td class="r num">–</td><td class="r num">–</td><td class="r num">–</td><td class="r num">–</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td></td><td>Company</td><td class="r num">79.3%</td><td class="r num">−2.8</td><td class="r num">2,175 shifts</td><td class="r num">11 of 19</td><td class="r num">$500k</td><td class="r num">$2,321k</td><td class="r num">8 · $615k</td><td class="r num">12 · $813k</td></tr>
+      </tfoot>
+    </table>
+  </div>
+  <p class="note"><strong>Tier rules.</strong> Act now: fill below 75% with renewals due in 3 months or churn this year. Protect renewals: healthy fill, value renewing in 3 months. Monitor: churn this year or fill down 3+ points, nothing renewing soon. Too small to rate: fewer than 25 working ATs.</p>
+</section>
+
+<!-- 4. Recommendations -->
+<section aria-labelledby="rec-h">
+  <div class="section-head">
+    <div class="eyebrow">Part 4 · What to do</div>
+    <h2 id="rec-h">Recommendations</h2>
+    <p class="lede">Concentrate the next 90 days on Philadelphia and Baltimore. Run a standard renewal play everywhere else.</p>
+  </div>
+  <ol class="recs">
+    <li class="lead">
+      <span class="when">Next 60 days</span>
+      <div class="body">
+        <h3>AT supply push in Philadelphia and Baltimore</h3>
+        <p>Recruit and reactivate ATs and put targeted incentives on hard-to-fill shifts. Target at least 75% fill by December, with 80% as the stretch. Track fill weekly by metro.</p>
+        <p class="because">Because demand grew everywhere, but only these two metros failed to raise shifts per AT (steps 1–3).</p>
+      </div>
+    </li>
+    <li class="lead">
+      <span class="when">Oct–Dec</span>
+      <div class="body">
+        <h3>A named owner and coverage plan for the 5 renewals there ($387k)</h3>
+        <ul class="accounts">
+          <li>Fairmount Park Athletics, Philadelphia · Oct · $34k</li>
+          <li>Inner Harbor Youth Sports, Baltimore · Oct · $29k</li>
+          <li>Penn Charter Network, Philadelphia · Nov · $92k</li>
+          <li>Navy Yard Fieldhouse, Philadelphia · Dec · $128k</li>
+          <li>Columbia Sports Park, Baltimore · Dec · $104k</li>
+        </ul>
+        <p class="because">Because these metros renewed only 1 in 4 this year, and the two December contracts are 60% of the value (steps 4 and 7).</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">Nov–Dec</span>
+      <div class="body">
+        <h3>Early renewal contact for the other three</h3>
+        <p>Potomac Indoor Center, Washington DC ($112k), Charlotte Indoor Sports ($96k), Lehigh Valley Volleyball ($20k). Coverage is healthy in these metros, so this is account management, not extra coverage spend.</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">Until fill recovers</span>
+      <div class="body">
+        <h3>Hold new contract commitments in Philadelphia and Baltimore</h3>
+        <p>Resume once fill is back to 75% for two months running. New contracts draw on the same short AT pool.</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">This board</span>
+      <div class="body">
+        <h3>Reset the retention expectation and fix the dashboard process</h3>
+        <p>Tell the board that 70% for 2026 needs all 8 remaining renewals. Have someone outside the measured team calculate the dashboard, using the definitions in the reconciliation script.</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">Later</span>
+      <div class="body">
+        <h3>Shift sales time toward inbound and referrals</h3>
+        <p>Outbound wins 2 of 31. Worth fixing, but it won't change this quarter. Plan ahead for Pittsburgh's $153k renewing January to March.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- 5. Scenarios -->
+<section aria-labelledby="scen-h">
+  <div class="section-head">
+    <div class="eyebrow">Part 5 · What it's worth</div>
+    <h2 id="scen-h">Financial scenarios</h2>
+    <p class="lede">Sensitivities at September demand, not forecasts. They don't include what the intervention costs. Gross profit and revenue are different measures, so the tables shouldn't be added together.</p>
+  </div>
+  <div class="scen-grid">
+    <div class="table-box">
+      <table>
+        <thead><tr><th>Fill, Philadelphia + Baltimore</th><th class="r">Extra shifts / month</th><th class="r">Company fill</th><th class="r">Gross profit / year</th></tr></thead>
+        <tbody>
+          <tr><td>To 75% (productive threshold)</td><td class="r num">108</td><td class="r num">80.3% (+1.03)</td><td class="r num">≈ $33.7k</td></tr>
+          <tr><td>To 80% (stretch)</td><td class="r num">303</td><td class="r num">82.2% (+2.89)</td><td class="r num">≈ $94.6k</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>5 renewals there, $387k</th><th class="r">Revenue kept</th></tr></thead>
+        <tbody>
+          <tr><td>At their 2026 rate (25%)</td><td class="r num">≈ $97k</td></tr>
+          <tr><td>At other metros' rate (82%)</td><td class="r num">≈ $317k</td></tr>
+          <tr><td><strong>Value of closing the gap</strong></td><td class="r num"><strong>≈ $220k</strong></td></tr>
+          <tr><td>All 5 renew</td><td class="r num">$387k</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="table-box">
+    <table>
+      <thead><tr><th>Year-end 2026 retention, 8 renewals left</th><th class="r">Renewed</th><th class="r">Retention</th><th>Against plan</th></tr></thead>
+      <tbody>
+        <tr><td>All 8 renew</td><td class="r num">19 of 27</td><td class="r num">70.4%</td><td><span class="chip c-ok">On plan</span></td></tr>
+        <tr><td>7 of 8 renew</td><td class="r num">18 of 27</td><td class="r num">66.7%</td><td><span class="chip c-bad">Below</span></td></tr>
+        <tr><td>Current metro rates continue</td><td class="r num">≈ 14.7 of 27</td><td class="r num">≈ 54%</td><td><span class="chip c-bad">Below</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Fill values use the README's $32,750 of annual gross profit per company fill point. Renewal values are annual contract revenue; the pack has no contract margin.</p>
+</section>
+
+<!-- 6. Checks and questions -->
+<section aria-labelledby="val-h">
+  <div class="section-head">
+    <div class="eyebrow">Part 6 · How far to trust it</div>
+    <h2 id="val-h">What I checked and what's still open</h2>
+  </div>
+  <div class="two-col">
+    <div style="display:grid; gap:0.6rem; min-width:0">
+      <h3>Validation</h3>
+      <ul class="list">
+        <li>Scorecard totals match the corrected board figures: 19 due, 11 renewed, 8 churned; $2,321k book; 2,175 unfilled shifts; 79.26% fill.</li>
+        <li>Renewal exposure matches the investigation: 8 contracts ($615k) by December, 12 ($813k) by March.</li>
+        <li>Data checks pass: unique keys, statuses agree with the 09/30 snapshot, every renewed contract has a successor, every contract metro has marketplace data.</li>
+        <li>The book bridge from August to September reconciles with zero difference.</li>
+        <li>Each corrected figure can be rebuilt by hand in the spreadsheet with filters and sums: retention 11 of 19, fill 8,311 ÷ 10,486, win rate 11 of 45.</li>
+        <li>Queries parse as BigQuery SQL and were run on a local copy built from the pack.</li>
+      </ul>
+    </div>
+    <div style="display:grid; gap:0.6rem; min-width:0">
+      <h3>Unresolved questions</h3>
+      <ul class="list">
+        <li>Why did the 6 Philadelphia and Baltimore customers leave? Exit reasons decide whether fixing fill also fixes retention.</li>
+        <li>Were those customers' own contracted shifts covered? Fill is measured per metro, not per customer.</li>
+        <li>Why are ATs there not taking more shifts: availability, travel, pay, or a competitor? This needs AT-level data.</li>
+        <li>How are contract and marketplace shifts prioritized from the shared AT pool?</li>
+        <li>What would it cost to add 108–303 filled shifts a month, and how fast?</li>
+        <li>Does $32,750 per fill point hold for these two metros and at this scale?</li>
+        <li>Is D-1059 a duplicate of D-1056? Which figures does Finance's cash floor assume?</li>
+        <li>Is the 70% plan measured by count or value? By value, retention is 66.1%, still below plan.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Built from 05b_board_reconciliation.sql, 06_investigation.sql and 07_metro_scorecard.sql on the Pipeline, Contracts and Marketplace tables.</span>
+  <span>Source tags like <span class="src">Q4.5</span> name the query that produced each figure.</span>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // Company fill trend
+  (function () {
+    var svg = document.getElementById("trend");
+    var data = [["Apr", 82.01], ["May", 81.96], ["Jun", 80.94], ["Jul", 80.89], ["Aug", 80.58], ["Sep", 79.26]];
+    var draft = 83.62;
+    var x0 = 48, x1 = 560, y0 = 190, y1 = 20, lo = 78, hi = 85;
+    var sx = function (i) { return x0 + i * (x1 - x0) / (data.length - 1); };
+    var sy = function (v) { return y0 - (v - lo) * (y0 - y1) / (hi - lo); };
+    for (var g = 78; g <= 85; g += 1) {
+      svg.appendChild(el("line", { x1: x0, x2: x1 + 20, y1: sy(g), y2: sy(g), stroke: "var(--rule)", "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: x0 - 8, y: sy(g) + 4, "text-anchor": "end" }, g + "%"));
+    }
+    var d = "", area = "M" + sx(0) + "," + y0;
+    data.forEach(function (p, i) { d += (i ? "L" : "M") + sx(i) + "," + sy(p[1]); area += "L" + sx(i) + "," + sy(p[1]); });
+    area += "L" + sx(data.length - 1) + "," + y0 + "Z";
+    svg.appendChild(el("path", { d: area, fill: "var(--accent-soft)", stroke: "none" }));
+    svg.appendChild(el("path", { d: d, fill: "none", stroke: "var(--accent)", "stroke-width": 2.5 }));
+    data.forEach(function (p, i) {
+      svg.appendChild(el("circle", { cx: sx(i), cy: sy(p[1]), r: i === data.length - 1 ? 5 : 3.5, fill: "var(--accent)" }));
+      svg.appendChild(el("text", { x: sx(i), y: y0 + 18, "text-anchor": "middle" }, p[0]));
+      svg.appendChild(el("text", { x: sx(i), y: sy(p[1]) - 10, "text-anchor": "middle", "class": "val" }, p[1].toFixed(1) + "%"));
+    });
+    var xs = sx(data.length - 1);
+    svg.appendChild(el("line", { x1: xs, x2: xs, y1: sy(draft) + 6, y2: sy(79.26) - 20, stroke: "var(--bad)", "stroke-width": 1, "stroke-dasharray": "3 3" }));
+    svg.appendChild(el("rect", { x: xs - 5, y: sy(draft) - 5, width: 10, height: 10, fill: "var(--bad)" }));
+    svg.appendChild(el("text", { x: xs - 12, y: sy(draft) + 4, "text-anchor": "end", "class": "val val-bad" }, "Draft 83.6%"));
+  })();
+
+  // Retention bars
+  (function () {
+    var svg = document.getElementById("ret");
+    var rows = [["Philadelphia + Baltimore", 25, "2 of 8", true], ["All other metros", 81.8, "9 of 11", false]];
+    var x0 = 12, x1 = 288, top = 30, h = 34, gap = 62;
+    var sx = function (v) { return x0 + v * (x1 - x0) / 100; };
+    rows.forEach(function (r, i) {
+      var y = top + i * gap;
+      svg.appendChild(el("text", { x: x0, y: y - 8, "class": "lbl" }, r[0]));
+      svg.appendChild(el("rect", { x: x0, y: y, width: x1 - x0, height: h, fill: "var(--paper)" }));
+      svg.appendChild(el("rect", { x: x0, y: y, width: sx(r[1]) - x0, height: h, fill: r[3] ? "var(--bad)" : "var(--ok)" }));
+      var inside = r[1] > 40;
+      svg.appendChild(el("text", { x: inside ? sx(r[1]) - 8 : sx(r[1]) + 8, y: y + h / 2 + 4, "text-anchor": inside ? "end" : "start", "class": "val", style: inside ? "fill: var(--sheet)" : "" }, Math.round(r[1]) + "% · " + r[2]));
+    });
+    var px = sx(70), yb = top + gap + h + 12;
+    svg.appendChild(el("line", { x1: px, x2: px, y1: top - 4, y2: yb, stroke: "var(--ink)", "stroke-width": 1.5, "stroke-dasharray": "4 3" }));
+    svg.appendChild(el("text", { x: px, y: yb + 14, "text-anchor": "middle" }, "70% plan"));
+  })();
+
+  // Fill dumbbell
+  (function () {
+    var svg = document.getElementById("dumbbell");
+    var rows = [
+      ["Baltimore", 83.0, 71.0], ["Philadelphia", 84.0, 73.0], ["Charlotte", 76.9, 80.0], ["Washington DC", 79.0, 81.0],
+      ["Richmond", 80.0, 83.1], ["Columbus", 81.1, 84.0], ["Lehigh Valley", 82.0, 84.0], ["Northern NJ", 82.0, 84.0],
+      ["Harrisburg-Lancaster", 82.1, 85.0], ["Pittsburgh", 83.0, 85.0]
+    ];
+    var x0 = 150, x1 = 505, lo = 68, hi = 88, top = 22, step = 28;
+    var sx = function (v) { return x0 + (v - lo) * (x1 - x0) / (hi - lo); };
+    var yb = top + (rows.length - 1) * step + 16;
+    for (var g = lo; g <= hi; g += 4) {
+      svg.appendChild(el("line", { x1: sx(g), x2: sx(g), y1: top - 12, y2: yb, stroke: "var(--rule)", "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: sx(g), y: yb + 16, "text-anchor": "middle" }, g + "%"));
+    }
+    svg.appendChild(el("rect", { x: sx(lo), y: top - 12, width: sx(75) - sx(lo), height: yb - top + 12, fill: "var(--bad-soft)", opacity: 0.6 }));
+    svg.appendChild(el("line", { x1: sx(75), x2: sx(75), y1: top - 12, y2: yb, stroke: "var(--bad)", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+    svg.appendChild(el("text", { x: sx(75) - 4, y: top - 2, "text-anchor": "end", "class": "val val-bad" }, "below 75%"));
+    rows.forEach(function (r, i) {
+      var y = top + 8 + i * step, below = r[2] < 75;
+      svg.appendChild(el("text", { x: x0 - 12, y: y + 4, "text-anchor": "end", "class": "lbl" }, r[0]));
+      svg.appendChild(el("line", { x1: sx(r[1]), x2: sx(r[2]), y1: y, y2: y, stroke: below ? "var(--bad)" : "var(--muted)", "stroke-width": 2, opacity: 0.7 }));
+      svg.appendChild(el("circle", { cx: sx(r[1]), cy: y, r: 4, fill: "var(--muted)" }));
+      svg.appendChild(el("circle", { cx: sx(r[2]), cy: y, r: 5.5, fill: below ? "var(--bad)" : "var(--accent)" }));
+      if (below) svg.appendChild(el("text", { x: sx(r[2]) - 10, y: y + 4, "text-anchor": "end", "class": "val val-bad" }, r[2].toFixed(0) + "%"));
+    });
+  })();
+})();
+</script>
+
+</body>
+</html>
