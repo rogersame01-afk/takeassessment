@@ -103,6 +103,23 @@ td.num, td .num { white-space: nowrap; }
 .c-bad { color: var(--bad); background: var(--bad-soft); }
 .c-warn { color: var(--warn); background: var(--warn-soft); }
 .c-none { color: var(--none); background: var(--none-soft); }
+.c-acc { color: var(--accent); background: var(--accent-soft); }
+h3.sub { font-size: 1.1rem; padding-top: 0.6rem; border-top: 1px solid var(--rule); }
+.log td:first-child { white-space: nowrap; color: var(--accent); }
+.log td:nth-child(2) { font-weight: 600; min-width: 11rem; }
+.log td:nth-child(3) { color: var(--muted); min-width: 18rem; }
+.table-box.flat { border: 0; background: transparent; }
+.table-box.flat th { background: transparent; }
+.chart-pair.wide-right { grid-template-columns: minmax(0, 1fr); }
+.chart-pair.wide-right figure:last-child { order: -1; }
+#dumbbell { max-width: 640px; }
+#ret { max-width: 420px; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.trace { font-size: 0.86rem; color: var(--muted); }
+.renewals { font-size: 0.86rem; }
+.renewals td { white-space: nowrap; }
+.renewals td.todo { color: var(--muted); font-style: italic; }
+.renewals tr.early td:nth-child(3) { color: var(--warn); font-weight: 600; }
 tfoot td { font-weight: 600; background: var(--paper); }
 
 /* Charts */
@@ -158,8 +175,9 @@ tr.hot td { background: var(--bad-soft); }
 
 footer { border-top: 1px solid var(--rule); padding-top: 1rem; font-size: 0.82rem; color: var(--muted); display: grid; gap: 0.3rem; }
 
+@media (max-width: 980px) { .trio, .chart-pair { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 760px) {
-  .chart-pair, .scen-grid, .two-col { grid-template-columns: minmax(0, 1fr); }
+  .chart-pair, .chart-pair.wide-right, .scen-grid, .two-col, .trio { grid-template-columns: minmax(0, 1fr); }
   .tally { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tally div:nth-child(2) { border-right: 0; }
   .tally div:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
@@ -182,7 +200,7 @@ a { color: var(--accent); }
   <div class="meta">
     <span>For AJH (CEO) and Joanna (COO)</span>
     <span>Sources: Pipeline, Contracts, Marketplace tables</span>
-    <span>Queries: 04, 05, 06 (BigQuery)</span>
+    <span>Queries: 04 reconciliation, 05 investigation, 06 scorecard (BigQuery)</span>
   </div>
 </header>
 
@@ -274,55 +292,165 @@ a { color: var(--accent); }
   </figure>
 </section>
 
-<!-- 2. Findings -->
-<section aria-labelledby="find-h">
+<!-- 2. Investigation -->
+<section aria-labelledby="inv-h">
   <div class="section-head">
     <div class="eyebrow">Part 2 · Why, and where?</div>
-    <h2 id="find-h">The evidence chain</h2>
-    <p class="lede">Each step tests one idea. Together they point to two metros, and they rule out the obvious alternatives.</p>
+    <h2 id="inv-h">Investigation</h2>
+    <p class="lede">Thirteen queries, each testing one idea. Part 1 asked whether the numbers are right. This part asks where the problem sits, what explains it, what it doesn't explain, and what fixing it is worth.</p>
   </div>
 
-  <div class="chart-pair">
+  <div class="table-box">
+    <table class="log">
+      <thead><tr><th>Query</th><th>Question tested</th><th>Result</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Q4.1</td><td>Which metros drive the fill decline?</td><td>Philadelphia 84% → 73% and Baltimore 83% → 71% since April. Every other established metro rose 2 to 3 points.</td><td><span class="chip c-bad">Finding</span></td></tr>
+        <tr><td class="num">Q4.2</td><td>Is demand outrunning AT supply?</td><td>Requests grew 44–54% and ATs 22–35% in every metro. Elsewhere each AT took on more shifts, reaching 4.3–4.7 a month. Philadelphia stayed at 4.2, and Baltimore rose only to 4.2.</td><td><span class="chip c-bad">Finding</span></td></tr>
+        <tr><td class="num">Q4.3</td><td>Where are the unfilled shifts?</td><td>1,083 of 2,175 (50%) are in the two metros.</td><td><span class="chip c-bad">Finding</span></td></tr>
+        <tr><td class="num">Q4.4</td><td>Did churn follow weak fill before renewal?</td><td>Churned contracts there had about 81% fill in the three months before renewal, against 83% for those that renewed. Charlotte, lowest at 78%, kept both.</td><td><span class="chip c-warn">Caution</span></td></tr>
+        <tr><td class="num">Q4.5</td><td>Are the lost customers in the same metros?</td><td>Retention 25% there (2 of 8) against 82% elsewhere (9 of 11). By value, 29% against 95%.</td><td><span class="chip c-bad">Finding</span></td></tr>
+        <tr><td class="num">Q4.6</td><td>Is it a customer-segment problem?</td><td>Churn in the two metros spans 2 clubs, 2 schools and 2 facilities. Clubs renew worst overall (1 of 5).</td><td><span class="chip c-none">Ruled out</span></td></tr>
+        <tr><td class="num">Q4.12</td><td>Are contracts using up the ATs?</td><td>Charlotte has the most contracts per AT (4.1 per 100) and fills 80%. Philadelphia (1.2) and Baltimore (1.6) are below average.</td><td><span class="chip c-none">Ruled out</span></td></tr>
+        <tr><td class="num">Q4.8</td><td>Is new business the problem?</td><td>Outbound wins 2 of 31, inbound 7 of 12, referral 2 of 2. Clubs win 3 of 22.</td><td><span class="chip c-acc">Secondary</span></td></tr>
+        <tr><td class="num">Q4.9</td><td>Why are deals lost?</td><td>No decision (10 deals, $518k) leads, then price (8) and budget (8).</td><td><span class="chip c-acc">Secondary</span></td></tr>
+        <tr><td class="num">Q4.7</td><td>What renews next?</td><td>8 contracts worth $615k by December, 5 of them ($387k) in the two metros. Nothing more renews there before April.</td><td><span class="chip c-ok">Sizing</span></td></tr>
+        <tr><td class="num">Q4.10</td><td>What is fixing fill worth?</td><td>75% fill needs 108 more shifts a month (≈ $33.7k gross profit a year). 80% needs 303 (≈ $94.6k).</td><td><span class="chip c-ok">Sizing</span></td></tr>
+        <tr><td class="num">Q4.11A</td><td>What has churn cost there?</td><td>6 contracts and $460k of annual value lost this year.</td><td><span class="chip c-ok">Sizing</span></td></tr>
+        <tr><td class="num">Q4.11B</td><td>Can 2026 still reach the 70% plan?</td><td>Only if all 8 remaining renewals go through (70.4%). One more churn caps the year at 66.7%.</td><td><span class="chip c-bad">Finding</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub">Coverage: where fill fell, and why</h3>
+  <div class="chart-pair wide-right">
     <figure>
-      <h3>Retention, 2026 to date</h3>
-      <svg id="ret" viewBox="0 0 300 200" role="img" aria-label="Retention: Philadelphia and Baltimore 25%, 2 of 8; all other metros 82%, 9 of 11; plan 70%"></svg>
-      <figcaption>Contracts that ended January to September. <span class="src">Q4.5</span></figcaption>
+      <h3>Shifts filled per AT, April to September</h3>
+      <div class="table-box flat">
+        <table>
+          <thead><tr><th>Metro</th><th class="r">Requests</th><th class="r">ATs</th><th class="r">Filled per AT</th><th class="r">Requests per AT, Sep</th></tr></thead>
+          <tbody>
+            <tr class="hot"><td>Baltimore</td><td class="r num">+53%</td><td class="r num">+23%</td><td class="r num">3.97 → 4.23</td><td class="r num">5.95</td></tr>
+            <tr class="hot"><td>Philadelphia</td><td class="r num">+46%</td><td class="r num">+26%</td><td class="r num">4.20 → 4.23</td><td class="r num">5.80</td></tr>
+            <tr><td>Charlotte</td><td class="r num">+54%</td><td class="r num">+35%</td><td class="r num">3.64 → 4.32</td><td class="r num">5.41</td></tr>
+            <tr><td>Washington DC</td><td class="r num">+46%</td><td class="r num">+28%</td><td class="r num">3.79 → 4.46</td><td class="r num">5.50</td></tr>
+            <tr><td>Richmond</td><td class="r num">+50%</td><td class="r num">+32%</td><td class="r num">3.81 → 4.51</td><td class="r num">5.42</td></tr>
+            <tr><td>Lehigh Valley</td><td class="r num">+50%</td><td class="r num">+28%</td><td class="r num">3.86 → 4.62</td><td class="r num">5.50</td></tr>
+            <tr><td>Harrisburg-Lancaster</td><td class="r num">+47%</td><td class="r num">+28%</td><td class="r num">3.88 → 4.62</td><td class="r num">5.43</td></tr>
+            <tr><td>Columbus</td><td class="r num">+49%</td><td class="r num">+28%</td><td class="r num">3.85 → 4.63</td><td class="r num">5.51</td></tr>
+            <tr><td>Pittsburgh</td><td class="r num">+48%</td><td class="r num">+28%</td><td class="r num">3.95 → 4.66</td><td class="r num">5.49</td></tr>
+            <tr><td>Northern NJ</td><td class="r num">+44%</td><td class="r num">+23%</td><td class="r num">3.91 → 4.71</td><td class="r num">5.61</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption>Every metro absorbed demand by having each AT take more shifts, except Philadelphia (flat) and Baltimore (smallest gain, and the widest gap between request and AT growth). They now have the most requests per AT. <span class="src">Q4.2</span></figcaption>
     </figure>
     <figure>
       <h3>Fill by metro, April to September</h3>
       <svg id="dumbbell" viewBox="0 0 520 330" role="img" aria-label="Fill by metro from April to September. Philadelphia fell from 84% to 73%, Baltimore from 83% to 71%. Every other metro rose 2 to 3 points."></svg>
       <div class="legend"><span><i style="background: var(--muted)"></i>April</span><span><i style="background: var(--accent)"></i>September</span><span><i style="background: var(--bad)"></i>September, below 75%</span></div>
+      <figcaption>The two metros also hold 50% of September's unfilled shifts. <span class="src">Q4.1 · Q4.3</span></figcaption>
     </figure>
   </div>
 
+  <h3 class="sub">Customers: where contracts were lost, and how far fill explains it</h3>
+  <div class="chart-pair">
+    <figure>
+      <h3>Retention, 2026 to date</h3>
+      <svg id="ret" viewBox="0 0 300 200" role="img" aria-label="Retention: Philadelphia and Baltimore 25%, 2 of 8; all other metros 82%, 9 of 11; plan 70%"></svg>
+      <figcaption>Contracts that ended January to September. By value: 29% against 95%. <span class="src">Q4.5</span></figcaption>
+    </figure>
+    <figure>
+      <h3>Fill in the three months before each renewal</h3>
+      <div class="table-box flat">
+        <table>
+          <thead><tr><th>Metro</th><th class="r">Renewed</th><th class="r">Churned</th><th class="r">Fill, renewed</th><th class="r">Fill, churned</th></tr></thead>
+          <tbody>
+            <tr class="hot"><td>Philadelphia</td><td class="r num">1</td><td class="r num">3</td><td class="r num">83.0%</td><td class="r num">81.5%</td></tr>
+            <tr class="hot"><td>Baltimore</td><td class="r num">1</td><td class="r num">3</td><td class="r num">82.0%</td><td class="r num">80.4%</td></tr>
+            <tr><td>Northern NJ</td><td class="r num">2</td><td class="r num">1</td><td class="r num">81.9%</td><td class="r num">no data*</td></tr>
+            <tr><td>Richmond</td><td class="r num">0</td><td class="r num">1</td><td class="r num">–</td><td class="r num">80.0%</td></tr>
+            <tr><td>Charlotte</td><td class="r num">2</td><td class="r num">0</td><td class="r num">77.6%</td><td class="r num">–</td></tr>
+            <tr><td>Other metros</td><td class="r num">5</td><td class="r num">0</td><td class="r num">79–83%</td><td class="r num">–</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption>Churned contracts had only 1.5 points lower fill than renewed ones, and most left in June to August, before the September drop. *The Northern NJ churn was in February, before marketplace data starts in April. <span class="src">Q4.4</span></figcaption>
+    </figure>
+  </div>
+
+  <h3 class="sub">Alternatives tested</h3>
+  <div class="trio">
+    <figure>
+      <h3>Segment</h3>
+      <div class="table-box flat">
+        <table>
+          <thead><tr><th>Segment</th><th class="r">Renewed</th><th class="r">Churned in the two metros</th><th class="r">Elsewhere</th></tr></thead>
+          <tbody>
+            <tr><td>School</td><td class="r num">7 of 9</td><td class="r num">2</td><td class="r num">0</td></tr>
+            <tr><td>Club</td><td class="r num">1 of 5</td><td class="r num">2</td><td class="r num">2</td></tr>
+            <tr><td>Facility</td><td class="r num">3 of 5</td><td class="r num">2</td><td class="r num">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption>Churn in the two metros hit every segment evenly, so segment doesn't explain where it happened. Clubs are a separate watch item. <span class="src">Q4.6</span></figcaption>
+    </figure>
+    <figure>
+      <h3>Win rate by lead source</h3>
+      <div class="table-box flat">
+        <table>
+          <thead><tr><th>Source</th><th class="r">Won</th><th class="r">Rate</th></tr></thead>
+          <tbody>
+            <tr><td>Referral</td><td class="r num">2 of 2</td><td class="r num">100%</td></tr>
+            <tr><td>Inbound</td><td class="r num">7 of 12</td><td class="r num">58%</td></tr>
+            <tr><td>Outbound</td><td class="r num">2 of 31</td><td class="r num low">6%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption>A real problem, but a separate one. It doesn't explain lost renewals. <span class="src">Q4.8</span></figcaption>
+    </figure>
+    <figure>
+      <h3>Why deals are lost</h3>
+      <div class="table-box flat">
+        <table>
+          <thead><tr><th>Reason</th><th class="r">Deals</th><th class="r">Value</th></tr></thead>
+          <tbody>
+            <tr><td>No decision</td><td class="r num">10</td><td class="r num">$518k</td></tr>
+            <tr><td>Lost on price</td><td class="r num">8</td><td class="r num">$223k</td></tr>
+            <tr><td>Budget not approved</td><td class="r num">8</td><td class="r num">$201k</td></tr>
+            <tr><td>Chose a competitor</td><td class="r num">4</td><td class="r num">$157k</td></tr>
+            <tr><td>Hired an AT in house</td><td class="r num">4</td><td class="r num">$149k</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption>Stalled deals cost the most, which points at lead qualification more than price. <span class="src">Q4.9</span></figcaption>
+    </figure>
+  </div>
+
+  <h3 class="sub">What the evidence says</h3>
   <ol class="chain">
     <li>
-      <p class="claim">Fill fell in only two metros.</p>
-      <p class="detail">Philadelphia went from 84% to 73% and Baltimore from 83% to 71% since April. Every other established metro improved by 2 to 3 points. <span class="src">Q4.1</span></p>
+      <p class="claim">Fill fell in only two metros, and they hold half the unfilled shifts.</p>
+      <p class="detail">Philadelphia went from 84% to 73% and Baltimore from 83% to 71%. Every other established metro improved. <span class="src">Q4.1 · Q4.3</span></p>
     </li>
     <li>
-      <p class="claim">Those two metros hold half the problem.</p>
-      <p class="detail">1,083 of the company's 2,175 unfilled shifts in September (50%) were in Philadelphia and Baltimore. <span class="src">Q4.3</span></p>
-    </li>
-    <li>
-      <p class="claim">It isn't extra demand.</p>
-      <p class="detail">Since April every metro got 44–54% more shift requests and added 22–35% more ATs. Elsewhere each AT took on more shifts (now 4.3–4.7 a month). In Philadelphia and Baltimore they stayed at about 4.2. <span class="src">Q4.2</span></p>
+      <p class="claim">Demand grew everywhere. The difference is how many shifts each AT took.</p>
+      <p class="detail">Other metros met 44–54% more requests by having each AT fill more shifts. In Philadelphia that number didn't move, and in Baltimore it rose least while requests grew fastest. <span class="src">Q4.2</span></p>
     </li>
     <li>
       <p class="claim">The same two metros are losing contract customers.</p>
-      <p class="detail">Retention is 25% there (2 of 8) against 82% everywhere else (9 of 11). They account for 6 of the 8 lost contracts and $460k of the $500k churned value. <span class="src">Q4.5</span></p>
+      <p class="detail">25% retention against 82% elsewhere: 6 of the 8 lost contracts and $460k of the $500k churned value. <span class="src">Q4.5 · Q4.11A</span></p>
     </li>
     <li class="ruled">
-      <p class="claim">Ruled out: a segment problem, contract load, and sales as the cause.</p>
-      <p class="detail">The lost customers there were 2 clubs, 2 schools and 2 facilities <span class="src">Q4.6</span>. Charlotte has the most contracts per AT (4 per 100) and still fills 80% <span class="src">Q4.12</span>. Outbound sales win only 2 of 31 deals against 7 of 12 inbound, which is a real but separate issue <span class="src">Q4.8</span>.</p>
+      <p class="claim">Segment, contract load and sales don't explain the concentration.</p>
+      <p class="detail">Churn there spans every segment <span class="src">Q4.6</span>, the metro with the heaviest contract load still fills 80% <span class="src">Q4.12</span>, and weak outbound sales are a separate issue <span class="src">Q4.8</span>.</p>
     </li>
     <li class="caution">
-      <p class="claim">Caution: this shows the problems in the same place, not that one caused the other.</p>
-      <p class="detail">Most customers left in June to August, before the September drop. In the three months before renewal, churned contracts there had about 81% fill against 83% for those that renewed. Charlotte had the lowest pre-renewal fill (78%) and kept both contracts. <span class="src">Q4.4</span></p>
+      <p class="claim">The problems sit in the same place, but cause isn't proven.</p>
+      <p class="detail">Fill before renewal was only 1.5 points lower for churned contracts, and most churn came before the September drop. The exit reasons are still needed. <span class="src">Q4.4</span></p>
     </li>
     <li>
       <p class="claim">More is at risk, and the 70% plan now needs every renewal.</p>
-      <p class="detail">Eight contracts worth $615k renew by December, five of them ($387k) in Philadelphia and Baltimore <span class="src">Q4.7</span>. Reaching 70% for 2026 takes all eight: 19 of 27 is 70.4%, and one more churn caps the year at 66.7% <span class="src">Q4.11B</span>.</p>
+      <p class="detail">5 renewals worth $387k are due there by December. All 8 company renewals must go through for 2026 to reach 70%. <span class="src">Q4.7 · Q4.11B</span></p>
     </li>
   </ol>
 </section>
@@ -332,7 +460,7 @@ a { color: var(--accent); }
   <div class="section-head">
     <div class="eyebrow">Part 3 · Metro by metro</div>
     <h2 id="score-h">Commercial scorecard</h2>
-    <p class="lede">Fill, lost value and upcoming renewals side by side. Tiers are explicit rules, so each one maps to an action. <span class="src">06_metro_scorecard</span></p>
+    <p class="lede">Fill, lost value and upcoming renewals side by side. The investigation found the problem one question at a time. The scorecard puts the same results on one row per metro, adds a tier that maps to an action, and reruns next month by changing one date. <span class="src">06_metro_scorecard</span></p>
   </div>
   <div class="table-box">
     <table>
@@ -369,57 +497,69 @@ a { color: var(--accent); }
   <div class="section-head">
     <div class="eyebrow">Part 4 · What to do</div>
     <h2 id="rec-h">Recommendations</h2>
-    <p class="lede">Concentrate the next 90 days on Philadelphia and Baltimore. Run a standard renewal play everywhere else.</p>
+    <p class="lede">Keep the 90-day focus on Philadelphia and Baltimore. They account for nearly half of September's unfilled shifts, 92% of churned annual contract value ($460k of $500k) and $387k of renewals due by December. Each action below says what to do, what to verify first, and when to commit resources.</p>
   </div>
   <ol class="recs">
     <li class="lead">
-      <span class="when">Next 60 days</span>
+      <span class="when">60 days · diagnose first 2 weeks</span>
       <div class="body">
-        <h3>AT supply push in Philadelphia and Baltimore</h3>
-        <p>Recruit and reactivate ATs and put targeted incentives on hard-to-fill shifts. Target at least 75% fill by December, with 80% as the stretch. Track fill weekly by metro.</p>
-        <p class="because">Because demand grew everywhere, but only these two metros failed to raise shifts per AT (steps 1–3).</p>
+        <h3>Fulfillment program in Philadelphia and Baltimore</h3>
+        <p>Start with a two-week diagnosis. Little or no growth in shifts filled per AT can come from availability, scheduling, travel, pay or competing contract assignments. Test the cause at shift level, then pilot the matching fix.</p>
+        <p>Target 75% fill in each metro first. Treat 80% as a stretch goal, subject to cost and feasibility. Track filled shifts, customer coverage and incremental cost weekly.</p>
+        <p class="because">Because fill fell only here, these metros hold half the unfilled shifts, and their ATs took on few or no extra shifts while requests grew (Philadelphia 4.20 → 4.23, Baltimore 3.97 → 4.23). <span class="src">Q4.1 · Q4.2 · Q4.3</span></p>
       </div>
     </li>
     <li class="lead">
       <span class="when">Oct–Dec</span>
       <div class="body">
-        <h3>A named owner and coverage plan for the 5 renewals there ($387k)</h3>
-        <ul class="accounts">
-          <li>Fairmount Park Athletics, Philadelphia · Oct · $34k</li>
-          <li>Inner Harbor Youth Sports, Baltimore · Oct · $29k</li>
-          <li>Penn Charter Network, Philadelphia · Nov · $92k</li>
-          <li>Navy Yard Fieldhouse, Philadelphia · Dec · $128k</li>
-          <li>Columbia Sports Park, Baltimore · Dec · $104k</li>
-        </ul>
-        <p class="because">Because these metros renewed only 1 in 4 this year, and the two December contracts are 60% of the value (steps 4 and 7).</p>
+        <h3>An owner and a dated plan for each of the 5 priority renewals ($387k)</h3>
+        <p>Give each account an owner, a verified renewal status, a coverage review and a dated next customer milestone. At the 09/30 snapshot the two October accounts come first by deadline. Start the two December accounts early too: they are $232k, about 60% of the exposure.</p>
+        <div class="table-box flat">
+          <table class="renewals">
+            <thead><tr><th>Account</th><th>Metro</th><th>Due</th><th class="r">Value</th><th>Owner</th><th>Status verified</th><th>Coverage review</th><th>Next milestone</th></tr></thead>
+            <tbody>
+              <tr><td>Fairmount Park Athletics</td><td>Philadelphia</td><td class="num">Oct</td><td class="r num">$34k</td><td class="todo">Assign</td><td class="todo">Pending</td><td class="todo">Pending</td><td class="todo">Set date</td></tr>
+              <tr><td>Inner Harbor Youth Sports</td><td>Baltimore</td><td class="num">Oct</td><td class="r num">$29k</td><td class="todo">Assign</td><td class="todo">Pending</td><td class="todo">Pending</td><td class="todo">Set date</td></tr>
+              <tr><td>Penn Charter Network</td><td>Philadelphia</td><td class="num">Nov</td><td class="r num">$92k</td><td class="todo">Assign</td><td class="todo">Pending</td><td class="todo">Pending</td><td class="todo">Set date</td></tr>
+              <tr class="early"><td>Navy Yard Fieldhouse</td><td>Philadelphia</td><td class="num">Dec · start early</td><td class="r num">$128k</td><td class="todo">Assign</td><td class="todo">Pending</td><td class="todo">Pending</td><td class="todo">Set date</td></tr>
+              <tr class="early"><td>Columbia Sports Park</td><td>Baltimore</td><td class="num">Dec · start early</td><td class="r num">$104k</td><td class="todo">Assign</td><td class="todo">Pending</td><td class="todo">Pending</td><td class="todo">Set date</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="because">Because these metros renewed 2 of 8 contract terms this year, against 9 of 11 elsewhere. <span class="src">Q4.5 · Q4.7</span></p>
       </div>
     </li>
     <li>
       <span class="when">Nov–Dec</span>
       <div class="body">
-        <h3>Early renewal contact for the other three</h3>
-        <p>Potomac Indoor Center, Washington DC ($112k), Charlotte Indoor Sports ($96k), Lehigh Valley Volleyball ($20k). Coverage is healthy in these metros, so this is account management, not extra coverage spend.</p>
+        <h3>Standard outreach for the other three renewals</h3>
+        <p>Potomac Indoor Center, Washington DC ($112k); Charlotte Indoor Sports ($96k); Lehigh Valley Volleyball ($20k). Verify each account's own coverage before deciding whether extra support is needed.</p>
+        <p class="because">Because the three metros filled 80–84%, but that describes the marketplace, not these customers. Washington DC and Charlotte renewed all three terms due between them. Lehigh Valley had no renewal decisions this year, so it has no observed renewal rate. <span class="src">Scorecard · Q4.4</span></p>
       </div>
     </li>
     <li>
-      <span class="when">Until fill recovers</span>
+      <span class="when">Every new deal</span>
       <div class="body">
-        <h3>Hold new contract commitments in Philadelphia and Baltimore</h3>
-        <p>Resume once fill is back to 75% for two months running. New contracts draw on the same short AT pool.</p>
+        <h3>Capacity approval for each new commitment</h3>
+        <p>Marketplace Operations and Contract Services check AT availability for the proposed shifts, scheduling feasibility, expected margin and the effect on existing obligations. Approve deals that pass. Delay, reprice or revise those with unresolved coverage or economics. Monitor sustained metro fill alongside the deal review.</p>
+        <p class="because">Because Philadelphia and Baltimore already have the most shift requests per AT, and new contracts draw on the same pool. <span class="src">Q4.2</span></p>
       </div>
     </li>
     <li>
       <span class="when">This board</span>
       <div class="body">
-        <h3>Reset the retention expectation and fix the dashboard process</h3>
-        <p>Tell the board that 70% for 2026 needs all 8 remaining renewals. Have someone outside the measured team calculate the dashboard, using the definitions in the reconciliation script.</p>
+        <h3>Reset the board expectation and fix the dashboard process</h3>
+        <p><strong>Dashboard (owner: Analytics).</strong> Analytics owns the metric definitions and the reconciliation. An independent reviewer checks it, and the business owner signs off before publication.</p>
+        <p><strong>Board expectation (separate owner).</strong> All 8 remaining terms must renew to reach 70.4%; 7 would give 66.7%. This assumes the plan counts contract terms and the full-year cohort stays at 27. Confirm that definition before reporting against plan.</p>
+        <p class="because">Because three of eight board figures were wrong, and one more churn caps 2026 below plan. <span class="src">Part 1 · Q4.11B</span></p>
       </div>
     </li>
     <li>
-      <span class="when">Later</span>
+      <span class="when">In parallel</span>
       <div class="body">
-        <h3>Shift sales time toward inbound and referrals</h3>
-        <p>Outbound wins 2 of 31. Worth fixing, but it won't change this quarter. Plan ahead for Pittsburgh's $153k renewing January to March.</p>
+        <h3>Investigate sales efficiency before reallocating time</h3>
+        <p>Check deal mix, qualification, sales effort and acquisition economics, and verify what the $518k tagged "no decision" represents. Two referral deals are too few to judge referral performance. Add Pittsburgh's $153k of January–March renewals to the renewal calendar with an owner and a review date.</p>
+        <p class="because">Because inbound won 7 of 12 closed opportunities against 2 of 31 outbound, and "no decision" is the costliest loss reason. <span class="src">Q4.8 · Q4.9 · Scorecard</span></p>
       </div>
     </li>
   </ol>
