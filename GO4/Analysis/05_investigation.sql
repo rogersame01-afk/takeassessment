@@ -23,12 +23,18 @@ WHERE s.month = '2026-09'
 ORDER BY s.shifts_posted / a.shifts_posted - s.working_ats / a.working_ats DESC;
 
 -- Q4.3 Share of the company's unfilled shifts, September
-SELECT metro, shifts_posted - shifts_filled AS unfilled,
-       ROUND((shifts_posted - shifts_filled) /
-             (SELECT SUM(shifts_posted - shifts_filled) FROM `go4stage2.go4.stg_marketplace` WHERE month = '2026-09'), 3) AS share_of_unfilled
+SELECT
+  metro,
+  shifts_posted - shifts_filled AS unfilled,
+  ROUND(
+    100 * (shifts_posted - shifts_filled) /
+    NULLIF((SELECT SUM(shifts_posted - shifts_filled)
+            FROM `go4stage2.go4.stg_marketplace`
+            WHERE month = '2026-09'), 0),
+    1) AS pct_of_total_unfilled
 FROM `go4stage2.go4.stg_marketplace`
 WHERE month = '2026-09'
-ORDER BY unfilled DESC;
+ORDER BY pct_of_total_unfilled DESC
 
 -- Q4.4: Renewal outcomes by metro and
 -- pre-renewal marketplace fulfillment
